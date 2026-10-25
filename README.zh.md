@@ -2,9 +2,6 @@
 
 DeepSeek Harness（DSH）Web UI 插件：**按轮次索引引用对话**（可以跨会话引用），不用复制粘贴原文。
 
-fork 自 [`lianginx/dsh-quote-selection`](https://github.com/lianginx/dsh-quote-selection) @ `7039316`，
-上游功能是「选中文字 → 引用成 Markdown 引用块」。**本 fork 功能已变**，差异见 [`FORK-NOTES.md`](./FORK-NOTES.md)。
-
 ---
 
 ## 功能
@@ -35,7 +32,10 @@ host 半区在 `agent/pre-step` 阶段解析索引，把被引用的轮次作为
 
 ```bash
 # 从 git（宿主机要能访问 github.com）
-pnpm dsh plugin --profile <profile> add github:<owner>/dsh-turn-reference
+pnpm dsh plugin --profile <profile> add github:yichengup/dsh-turn-reference
+
+# 锁定版本
+pnpm dsh plugin --profile <profile> add github:yichengup/dsh-turn-reference#v0.3.0
 
 # 或从本地目录 / tarball（绝对路径，带引号）
 pnpm dsh plugin --profile <profile> add "/abs/path/dsh-turn-reference-0.3.0.tgz"
@@ -58,10 +58,18 @@ pnpm dsh plugin --profile <profile> add "/abs/path/dsh-turn-reference-0.3.0.tgz"
 
 ---
 
-## 注意
+## 许可
 
-包名与上游**不同**（`dsh-turn-reference` vs `dsh-quote-selection`），所以装/更新上游不会覆盖本 fork，反之亦然。
+MIT，见 [`LICENSE`](./LICENSE)。
 
 ---
 
-MIT © 上游作者；fork 改动见 `FORK-NOTES.md`。
+## 致谢与来源
+
+本项目基于 [`lianginx/dsh-quote-selection`](https://github.com/lianginx/dsh-quote-selection)
+@ `7039316` 修改而来，该版本的功能是「选中对话文字 → 引用成 Markdown 块引用」。
+
+**本项目的功能已经改为**按轮次索引 / 跨会话引用，逐文件差异与实现说明见 [`FORK-NOTES.md`](./FORK-NOTES.md)。
+
+因为包名与上游不同（`dsh-turn-reference` / `dsh-quote-selection`），安装或更新上游都不会覆盖本项目，
+反之亦然。上游的版权声明保留在 `LICENSE` 中。

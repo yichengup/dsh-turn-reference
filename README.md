@@ -1,11 +1,7 @@
 # dsh-turn-reference
 
-A DeepSeek Harness (DSH) Web UI plugin: **cite any conversation turn — including turns from
-other sessions — by index, instead of copy-pasting text.**
-
-Forked from [`lianginx/dsh-quote-selection`](https://github.com/lianginx/dsh-quote-selection)
-@ `7039316`, whose feature was "quote a text selection as a Markdown blockquote".
-**The functionality is now different** — see [`FORK-NOTES.md`](./FORK-NOTES.md).
+A DeepSeek Harness (DSH) Web UI plugin: **cite any conversation turn by index — including turns
+from other sessions — instead of copy-pasting the text.**
 
 ---
 
@@ -39,7 +35,10 @@ An ambiguous selector is **never guessed** — it is reported as unreadable.
 
 ```bash
 # from git (requires network access to github.com from the host running dsh)
-pnpm dsh plugin --profile <profile> add github:<owner>/dsh-turn-reference
+pnpm dsh plugin --profile <profile> add github:yichengup/dsh-turn-reference
+
+# pin a release
+pnpm dsh plugin --profile <profile> add github:yichengup/dsh-turn-reference#v0.3.0
 
 # or from a local checkout / tarball (absolute path)
 pnpm dsh plugin --profile <profile> add "/abs/path/dsh-turn-reference-0.3.0.tgz"
@@ -63,11 +62,20 @@ container running the `web` profile).
 
 ---
 
-## Caveat
+## License
 
-This fork is a **different package name** from upstream (`dsh-turn-reference` vs
-`dsh-quote-selection`), so installing or updating upstream will not overwrite it — and vice versa.
+MIT. See [`LICENSE`](./LICENSE).
 
 ---
 
-MIT © upstream authors; fork changes as noted in `FORK-NOTES.md`.
+## Credits
+
+Based on [`lianginx/dsh-quote-selection`](https://github.com/lianginx/dsh-quote-selection)
+@ `7039316`, whose feature was *"select conversation text and quote it as a Markdown blockquote"*.
+
+**The functionality has since been changed** to turn indexing / cross-session citing — see
+[`FORK-NOTES.md`](./FORK-NOTES.md) for the file-by-file differences and implementation notes.
+
+Because this fork ships under a different package name (`dsh-turn-reference` vs the upstream
+`dsh-quote-selection`), installing or updating upstream will not overwrite it, and vice versa.
+The upstream copyright notice is retained in `LICENSE`.
