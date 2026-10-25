@@ -1,95 +1,73 @@
-<div align="center">
+# dsh-turn-reference
 
-<img src="assets/banner.svg" alt="dsh-quote-selection: select chat text, click ❝ Quote, it lands in the composer as a Markdown blockquote" width="880">
+A DeepSeek Harness (DSH) Web UI plugin: **cite any conversation turn — including turns from
+other sessions — by index, instead of copy-pasting text.**
 
-# dsh-quote-selection
-
-**❝ Quote selected chat text into the composer · A DeepSeek Harness Web UI plugin**
-
-[![GitHub release](https://img.shields.io/github/v/tag/lianginx/dsh-quote-selection?label=release)](https://github.com/lianginx/dsh-quote-selection/tags)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-4176E6)
-
-**Install**
-
-```sh
-dsh plugin --profile web add github:lianginx/dsh-quote-selection
-```
-
-[Features](#features) · [Install](#install) · [Usage](#usage) · [How it works](#how-it-works)
-
-English · [简体中文](README.zh.md)
-
-</div>
+Forked from [`lianginx/dsh-quote-selection`](https://github.com/lianginx/dsh-quote-selection)
+@ `7039316`, whose feature was "quote a text selection as a Markdown blockquote".
+**The functionality is now different** — see [`FORK-NOTES.md`](./FORK-NOTES.md).
 
 ---
 
-Inspired by ChatGPT's "Ask ChatGPT" selection popover: select any text in a conversation reply — one line or many — and a floating **❝ 引用 (Quote)** button appears above the selection's first line. Click it and the selection lands in the composer as a Markdown blockquote, with the caret ready on the line right below. Type your follow-up question immediately.
+## What it does
 
-## Features
+Every completed turn gets two extra buttons in its footer:
 
-- **Floating quote button** — appears on selection over conversation text; hides on scroll, resize, or clicking elsewhere
-- **Clean Markdown output** — one `> ` per line; multi-line selections carry proper `>` continuation lines and render as a standard blockquote after sending
-- **Chained quotes** — quoting again appends a new block separated by exactly one blank line, handy for asking about several passages at once
-- **Writes through the front door** — inserts via `inputActions.setDraft`, the input machine's single public write path, so undo history, reference chips, and draft stats all keep working
-- **Follows the app language** — the button label renders through DSH's locale service: 「引用」 on a Chinese UI, "Quote" on an English one
-- **Zero dependencies, zero build** — plain JavaScript shipped as-is; installing from GitHub runs no code and needs no pnpm `allowBuilds` permission
+| Button | Effect |
+|---|---|
+| **索引本轮** (Index this turn) | Inserts `@turn:N` into the composer — an *index*, never the exchange text |
+| **复制跨会话** (Copy cross-session) | Copies `@turn:N "<session id prefix>"` to the clipboard; paste it into **any** session and it still resolves |
+
+The host half resolves the token at `agent/pre-step` and attaches the referenced turns as
+untrusted, read-only background — rendered through the shipped *recall* row (with kept/omitted
+counts), not as an opaque blob.
+
+### Token syntax
+
+```
+@turn:13              → turn 13 of the current session
+@turn:13 "视频会话"   → turn 13 of the session whose title contains that text
+```
+
+The selector may also be a session-id prefix of at least 8 characters. Quotes are required: a
+selector may contain spaces, and without a terminator it would swallow the rest of the message.
+An ambiguous selector is **never guessed** — it is reported as unreadable.
+
+---
 
 ## Install
 
-```sh
-# From GitHub (pinning to a tag or commit is recommended)
-dsh plugin --profile web add github:lianginx/dsh-quote-selection
-# Or locked:
-dsh plugin --profile web add github:lianginx/dsh-quote-selection#v0.1.0
+```bash
+# from git (requires network access to github.com from the host running dsh)
+pnpm dsh plugin --profile <profile> add github:<owner>/dsh-turn-reference
 
-dsh --profile web   # or: dsh web
+# or from a local checkout / tarball (absolute path)
+pnpm dsh plugin --profile <profile> add "/abs/path/dsh-turn-reference-0.3.0.tgz"
 ```
 
-Local development install (with this checkout kept next to deepseek-harness):
+No build step: plain ESM, no dependencies, `exports` points straight at `index.js` / `client.js`.
 
-```sh
-dsh plugin --profile web add ../dsh-quote-selection
-```
+Requires Node `^22.19.0 || >=24.0.0`. Tested on DSH `0.2.1-rc.3` (Windows desktop, and a Linux
+container running the `web` profile).
 
-> `add` links the checkout (`link:` semantics), so editing `client.js` takes effect after restarting `dsh web` — no reinstall needed.
+---
 
-Requires `node ^22.19 || >=24` and a profile containing the official `@deepseek-ai/dsh-web-app` layer (the shipped `web` template has it).
+## Limits (host side)
 
-## Usage
+| Constant | Value | Meaning |
+|---|---|---|
+| `MAX_REFERENCES` | 8 | at most 8 cited turns per message |
+| `MAX_TURN_CHARS` | 8000 | per-turn character budget |
+| `MAX_TOTAL_CHARS` | 24000 | total character budget |
+| `ID_PREFIX_MIN` | 8 | minimum session-id prefix length |
 
-1. Select some text in any assistant reply;
-2. Click the floating **❝ 引用** button;
-3. The composer now holds:
+---
 
-   ```markdown
-   > The quoted first line
-   >
-   > The second line
-   ```
+## Caveat
 
-   with the caret on the line below — start typing your question;
-4. Select other text and quote again: the new block joins with exactly one blank line between quotes.
+This fork is a **different package name** from upstream (`dsh-turn-reference` vs
+`dsh-quote-selection`), so installing or updating upstream will not overwrite it — and vice versa.
 
-### Uninstall / upgrade
+---
 
-```sh
-dsh plugin --profile web remove dsh-quote-selection
-dsh plugin --profile web update dsh-quote-selection
-```
-
-## How it works
-
-| Piece | Slot / mechanism |
-|---|---|
-| Floating button | `shell.overlay` (additive list slot, click-through by default); selection validated against the product anchors `[data-conversation-scroll]` / `[data-composer-seat]` |
-| Draft write | An invisible bridge component on `conversation.composer.dock` holding `inputActions.setDraft` — the input machine's only public write path |
-| Styling | A `data-plugin`-tagged stylesheet injected inside the factory closure, built on theme tokens (`--dsw-alias-*`) so light and dark both adapt |
-| Timers | The Cordis `timer` service (`inject: ['timer']`); no native timer globals |
-| Copy | A plugin-private locale namespace registered through the Cordis `locale` service (`zh`/`en`, English fallback) |
-
-The browser half depends only on baseline module-table entries (`react`) and Cordis services (`slots`, `timer`) — no other `@deepseek-ai/*` value imports. The package follows the DSH publishing conventions ([publish tutorial](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md)): manifest dual declaration `dsh.bundle.patch` + `dsh.client { platform: 'web' }`, and a patch that only inserts rows.
-
-## License
-
-[MIT](LICENSE)
+MIT © upstream authors; fork changes as noted in `FORK-NOTES.md`.

@@ -25,10 +25,10 @@
  * apart. Both actions therefore live in ONE row wrapper that opts out of the
  * stretch with `align-self: flex-start`.
  *
- * Local fork of dsh-quote-selection @ 7039316 (upstream quoted a text selection
+ * Fork of lianginx/dsh-quote-selection @ 7039316 (upstream quoted a text selection
  * through a floating overlay). `dsh plugin update` will overwrite this file.
  */
-window.__ModuleLoader__.load({ id: 'dsh-quote-selection', factory: (require) => {
+window.__ModuleLoader__.load({ id: 'dsh-turn-reference', factory: (require) => {
 var module = { exports: {} };
 var exports = module.exports;
 
@@ -69,9 +69,9 @@ const BUTTON_CSS = [
 ].join('\n')
 
 if (typeof document !== 'undefined'
-  && document.querySelector('style[data-plugin="dsh-quote-selection"]') === null) {
+  && document.querySelector('style[data-plugin="dsh-turn-reference"]') === null) {
   const tag = document.createElement('style')
-  tag.dataset.plugin = 'dsh-quote-selection'
+  tag.dataset.plugin = 'dsh-turn-reference'
   tag.textContent = BUTTON_CSS
   document.head.appendChild(tag)
 }
@@ -144,15 +144,15 @@ async function copyToken(token) {
 }
 
 module.exports = {
-  name: 'quote-selection',
+  name: 'turn-reference',
   inject: ['timer', 'locale'],
   apply(ctx) {
     const slots = ctx.get('slots')
     if (slots === undefined) return
 
-    const t = ctx.locale.bind('quote-selection')
+    const t = ctx.locale.bind('turn-reference')
     ctx.effect(
-      () => ctx.locale.register('quote-selection', {
+      () => ctx.locale.register('turn-reference', {
         zh: {
           indexTurn: '索引本轮',
           done: '已索引',
@@ -170,7 +170,7 @@ module.exports = {
           hintCopy: 'Copy as a cross-session index; paste it into another session',
         },
       }),
-      'quote-selection: dictionaries',
+      'turn-reference: dictionaries',
     )
 
     /** One index action per completed Turn. */
@@ -235,7 +235,7 @@ module.exports = {
     }
 
     slots.inject('conversation.chat.turnTail', () => slots.register(
-      { name: 'conversation.chat.turnTail', id: 'quote-selection-turn', order: -10 },
+      { name: 'conversation.chat.turnTail', id: 'turn-reference-turn', order: -10 },
       TurnIndexAction,
     ))
   },

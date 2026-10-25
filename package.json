@@ -1,7 +1,7 @@
 {
-  "name": "dsh-quote-selection",
-  "description": "DSH Web UI plugin: select conversation text and quote it into the composer as a Markdown blockquote",
-  "version": "0.2.0",
+  "name": "dsh-turn-reference",
+  "description": "DSH Web UI plugin: cite any conversation turn (including turns from other sessions) with an @turn:N index token that the host resolves into reference context",
+  "version": "0.3.0",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -19,17 +19,18 @@
     "client.js",
     "cordis.patch.yml",
     "README.md",
+    "README.zh.md",
+    "FORK-NOTES.md",
     "LICENSE"
   ],
   "keywords": [
     "dsh",
     "dsh-plugin",
-    "deepseek-harness"
+    "deepseek-harness",
+    "turn-reference",
+    "cross-session",
+    "citation"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lianginx/dsh-quote-selection.git"
-  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"

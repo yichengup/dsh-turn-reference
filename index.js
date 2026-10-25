@@ -30,7 +30,7 @@
  * kept/omitted counts — rather than as an opaque blob. An unreadable record
  * degrades to the opaque body instead of failing.
  *
- * Local fork of dsh-quote-selection @ 7039316; `dsh plugin update` overwrites it.
+ * Fork of lianginx/dsh-quote-selection @ 7039316; `dsh plugin update` of the upstream package overwrites it.
  */
 import { randomUUID } from 'node:crypto'
 import z from '@deepseek-ai/schemastery'
@@ -55,7 +55,7 @@ const ID_PREFIX_MIN = 8
 const SESSION_PREFIX = 'session-'
 
 /** Cordis plugin name. */
-export const name = 'quote-selection'
+export const name = 'turn-reference'
 
 /**
  * Hard dependency, and it MUST be declared.
@@ -291,7 +291,7 @@ export function apply(ctx, config) {
     if (typeof ctx.provide === 'function') ctx.provide('turnReference', resolver)
     else if (typeof ctx.reflect?.provide === 'function') ctx.reflect.provide('turnReference', resolver)
   } catch (error) {
-    ctx.logger?.warn?.('[quote-selection] turnReference service not provided: %s',
+    ctx.logger?.warn?.('[turn-reference] turnReference service not provided: %s',
       error instanceof Error ? error.message : String(error))
   }
 
@@ -329,7 +329,7 @@ export function apply(ctx, config) {
       try {
         turnsBySession.set(sessionId, await readTurns(ctx.sessionQuery, sessionId))
       } catch (error) {
-        ctx.logger?.warn?.('[quote-selection] could not read session %s: %s',
+        ctx.logger?.warn?.('[turn-reference] could not read session %s: %s',
           sessionId, error instanceof Error ? error.message : String(error))
         turnsBySession.set(sessionId, null)
       }
@@ -396,7 +396,7 @@ export function apply(ctx, config) {
       }
       if (kept.length === 0 && unresolved.length === 0) continue
       if (unresolved.length > 0) {
-        ctx.logger?.warn?.('[quote-selection] unresolved citations: %o', unresolved)
+        ctx.logger?.warn?.('[turn-reference] unresolved citations: %o', unresolved)
       }
       // A cited token ALWAYS yields a context row, even when nothing resolved.
       // Silence would be indistinguishable from the host half not running.

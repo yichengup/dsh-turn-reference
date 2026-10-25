@@ -19,9 +19,9 @@
 |---|---|
 | `index.js`（host 半区） | **完全重写**（上游 9 行空壳 → 本 fork 431 行实现） |
 | `client.js`（browser 半区） | **完全重写**（上游是选区浮动「引用」按钮 → 本 fork 是每轮底部的两个按钮） |
-| `package.json` | 与上游一致（名称仍为 `dsh-quote-selection`） |
-| `cordis.patch.yml` | 与上游一致 |
-| `README.md` / `README.zh.md` | 与上游一致（⚠️ 内容已不描述当前功能） |
+| `package.json` | **已改**：`name` → `dsh-turn-reference`、`version` → `0.3.0`、description/keywords 重写；`exports`/`files`/`engines` 结构沿用上游 |
+| `cordis.patch.yml` | 结构同上游，`id` / `name` 随包名改为 `turn-reference` / `dsh-turn-reference` |
+| `README.md` / `README.zh.md` | **已重写**，改为描述轮次引用功能（上游版讲的还是选中引用） |
 
 ## 当前功能
 
@@ -53,13 +53,13 @@ token 语法：
 - `source` 标记沿用官方 recall 的形态（`form: 'recall'` + `references[]`），
   所以前端是用现成的 recall 行渲染（带保留/省略条数），不是一坨不透明内容。
 
-## 两个已知坑
+## 改名带来的两个后果
 
-1. **`dsh plugin update` 会覆盖本 fork。** 上游包名一致，更新即回滚到原版功能。
-   真要升级，先把本仓库的内容改回 `package.json` 指向（或改用 git 依赖指向本 fork）。
-2. **`README.md` 还是上游的**，描述的是「选中引用」，与现在的功能不符 —— 备份后建议改写，
-   或者干脆在 GitHub 上把仓库改成 `dsh-turn-reference` 之类（`package.json` 的 `name`
-   保持 `dsh-quote-selection` 不变，否则已安装的 profile 依赖会断）。
+1. **包名变了 → 已装的 profile 依赖会断。** 从 `dsh-quote-selection` 换成 `dsh-turn-reference` 之后，
+   原 profile 里那条旧的依赖不再指向本插件，必须重新 `remove` 旧的、`add` 新的。已装过的地方
+   （本地 desktop profile、仙宫云容器 web profile）都要改。
+2. **好处是：更新上游不会覆盖本 fork 了。** 两个包名并存互不干扰，`dsh plugin update dsh-quote-selection`
+   只动上游那份。
 
 ## 兼容性
 
