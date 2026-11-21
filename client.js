@@ -130,17 +130,46 @@ function insertToken(inputActions, token) {
   return null
 }
 
-/** Copy one token to the clipboard. @returns null on success, else a reason. */
+/** Copy one token to the clipboard. Prefers the async Clipboard API and falls
+ *  back to execCommand('copy') where that API is missing or refuses the write
+ *  (insecure context, denied permission, unfocused document).
+ *  @returns null on success, else a reason. */
 async function copyToken(token) {
+  let apiError = null
   try {
-    if (navigator.clipboard === undefined || typeof navigator.clipboard.writeText !== 'function') {
-      return '剪贴板不可用'
+    if (typeof navigator !== 'undefined' && navigator.clipboard !== undefined
+      && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(token)
+      return null
     }
-    await navigator.clipboard.writeText(token)
-    return null
   } catch (error) {
-    return '复制失败: ' + String(error && error.message ? error.message : error).slice(0, 60)
+    apiError = error
   }
+  // The async API is absent or refused the write; execCommand still succeeds while
+  // the click's transient activation is valid.
+  try {
+    if (typeof document !== 'undefined' && typeof document.execCommand === 'function') {
+      const focused = document.activeElement
+      const el = document.createElement('textarea')
+      el.value = token
+      el.setAttribute('readonly', '')
+      el.style.position = 'fixed'
+      el.style.left = '-9999px'
+      try {
+        document.body.appendChild(el)
+        el.select()
+        if (document.execCommand('copy')) return null
+      } finally {
+        el.remove()
+        if (focused !== null && typeof focused.focus === 'function') focused.focus({ preventScroll: true })
+      }
+    }
+  } catch (fallbackError) {
+    // Both paths failed; the reason reported below comes from the Clipboard API.
+    void fallbackError
+  }
+  const detail = apiError !== null && apiError.message ? String(apiError.message) : ''
+  return detail === '' ? '剪贴板不可用' : '复制失败: ' + detail.slice(0, 80)
 }
 
 module.exports = {
